@@ -1,6 +1,6 @@
 # wallabag
 
-This repo helps you create a simple, self-hosted, Docker-based [Wallabag](https://www.wallabag.it/en) instance.
+This repo helps you easily create a self-hosted, Docker-based [Wallabag](https://www.wallabag.it/en) instance.
 
 # Instructions
 
