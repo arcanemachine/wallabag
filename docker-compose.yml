@@ -3,7 +3,7 @@ version: "3.8"
 services:
   wallabag:
     image: docker.io/wallabag/wallabag
-    user: "${UID}:${UID}"
+    user: "${UID}:${GID}"
     environment:
       SYMFONY__ENV__DOMAIN_NAME: http://localhost
       SYMFONY__ENV__FOSUSER_REGISTRATION: ${SYMFONY__ENV__FOSUSER_REGISTRATION:-true}
