@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  wallabag:
+    image: docker.io/wallabag/wallabag
+    user: "${UID}:${UID}"
+    environment:
+      SYMFONY__ENV__DOMAIN_NAME: http://localhost
+      SYMFONY__ENV__FOSUSER_REGISTRATION: ${SYMFONY__ENV__FOSUSER_REGISTRATION:-true}
+      SYMFONY__ENV__FOSUSER_CONFIRMATION: ${SYMFONY__ENV__FOSUSER_CONFIRMATION:-true}
+    ports:
+      - ${PORT:-80}:80
+    volumes:
+      - ${LOCAL_VOLUME_DATA_PATH:-./local-config}:/var/www/wallabag/data
+      - ${LOCAL_VOLUME_IMAGES_PATH:-./local-config/images}:/var/www/wallabag/web/assets/images

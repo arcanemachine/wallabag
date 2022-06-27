@@ -1,0 +1,62 @@
+#!/bin/bash
+
+cd $(dirname "$0")
+
+# use the name of the project directory as the name of the service
+service_name=$(basename $(pwd))
+service_file_path="/etc/systemd/system/$service_name.service"
+
+if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
+  echo "This script generates a systemd service file.
+The output will be sent here: '$service_file_path'.
+
+After running this command, you will need to reload systemd daemons (or reboot):
+  - sudo systemctl daemon-reload
+
+To enable this service:
+  - sudo systemctl enable $service_name.service
+
+To start this service:
+  - sudo systemctl start $service_name.service
+
+To output the service file template to the console, prefix the command with DRY_RUN=1:
+  - e.g: 'DRY_RUN=1 ./docker-systemd-service-file-generate'"
+  exit 0
+fi
+
+if [ "$service_user" == "" ]; then
+  service_user=root
+fi
+
+if [ "$DRY_RUN" == 1 ]; then
+  output_to=/dev/stdout
+else
+  output_to=$service_file_path
+fi
+
+echo "[Unit]
+Description=$service_name
+After=docker.service
+
+[Service]
+Restart=always
+User=$service_user
+Group=docker
+WorkingDirectory=$(pwd)
+
+# Shutdown container (if running) when unit is started
+ExecStartPre=$(which docker-compose) -f docker-compose.yml down
+
+# Start container when unit is started
+ExecStart=$(which docker-compose) -f docker-compose.yml up --remove-orphans
+
+# Stop container when unit is stopped
+ExecStop=$(which docker-compose) -f docker-compose.yml down
+
+[Install]
+WantedBy=multi-user.target" > $output_to
+
+if [ "$DRY_RUN" =!= "1" ]; then
+  echo "done"
+fi
+

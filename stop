@@ -1,0 +1,3 @@
+#/bin/bash
+
+$(which docker-compose) -H unix:$XDG_RUNTIME_DIR/podman/podman.sock -f docker-compose.yml down
