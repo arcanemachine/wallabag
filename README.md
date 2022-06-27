@@ -7,13 +7,13 @@ This repo helps you easily create a self-hosted, Docker-based [Wallabag](https:/
 
 To make things easy to set up, the default config allows users to register without needing to confirm their email address.
 
-#### If you plan on hosting this instance publicly over the Internet, you should probably disable user registration after creating your account. See the [Enviroment](#environment) section for instructions.
+#### If you plan on hosting this instance publicly over the Internet, you should probably disable user registration after creating your account. See the [Environment](#environment) section for instructions.
 
 
 # Instructions
 
 - Install `[Docker](https://docs.docker.com/engine/install/)` or `podman`
-- 
+
 - Install `[docker-compose](https://docs.docker.com/compose/install/)`
 
 - To start the instance:
@@ -23,7 +23,7 @@ To make things easy to set up, the default config allows users to register witho
     - Run the `./start` command. Run `./start -d` if you want to run the instance in the background.
 
 - To start the instance automatically on boot:
-  - Use one of the two included helper scripts:
+  - Use one of the two included helper scripts to generate a `systemd` service file:
     - `docker-systemd-service-file-generate`
     - `podman-systemd-service-file-generate`
   - Either script can be run with the `--help` flag to learn more about their use.
