@@ -14,7 +14,7 @@ To make things easy to set up, the default config allows users to register witho
 
 - Install `[Docker](https://docs.docker.com/engine/install/)` or `podman`
 
-- Install `[docker-compose](https://docs.docker.com/compose/install/)`
+- Install `[docker-compose](https://docs.docker.com/compose/install/)` (for Docker) or `podman-compose` (for `podman`).
 
 - To start the instance:
   - Docker host: Run the `./start-docker` command. Run `./start-docker -d` if you want to run the instance in the background.

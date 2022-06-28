@@ -2,39 +2,45 @@
 
 cd $(dirname "$0")
 
+# source dotenv
+if [ -f ".env" ]; then
+  echo "Importing environment from '.env'..."
+  set -o allexport; source .env; set +o allexport
+fi
+
+# source local dotenv
+if [ -f ".env.override" ]; then
+  echo "Importing environment from '.env.override'..."
+  set -o allexport; source .env.override; set +o allexport
+fi
+
 # use the name of the project directory as the name of the service
 service_name=$(basename $(pwd))
-service_file_path="$HOME/.config/systemd/user/$service_name.service"
+service_file="$HOME/systemd/user/$service_name.service"
 
 if [ "$1" == "--help" ] || [ "$1" == "-h" ]; then
   echo "This script generates a systemd service file.
-The output will be sent to: '$service_file_path'
+The output will be sent here: '$service_file'
 
-After running this command, you will need to reload systemd daemons (or reboot):
-  - systemctl --user daemon-reload
+In order to start this service on boot, you must enabling lingering for this user:
+  - sudo loginctl enable-linger $USER
 
 To enable this service:
   - systemctl --user enable $service_name.service
 
 To start this service:
-  - systemctl --user start $service_name.service
-
-In order to start this service on boot, you must enabling lingering for this user:
-  - sudo loginctl enable-linger $USER
-
-To output the service file template to the console, prefix the command with DRY_RUN=1:
-  - e.g: 'DRY_RUN=1 ./podman-systemd-service-file-generate'"
+  - systemctl --user start $service_name.service"
   exit 0
 fi
 
 if [ "$DRY_RUN" == 1 ]; then
   output_to=/dev/stdout
 else
-  output_to=$service_file_path
+  output_to=~/.config/systemd/user/${service_name}.service
 fi
 
 echo "[Unit]
-Description=$service_name
+Description=${service_name}
 Wants=network-online.target
 After=network-online.target
 Requires=podman.service
@@ -42,22 +48,24 @@ RequiresMountsFor=/run/user/$(id -u)/containers
 
 [Service]
 # Environment=PODMAN_SYSTEMD_UNIT=%n
+Environment=COMPOSE_DOCKER_CLI_BUILD=0
+
 Restart=on-failure
 WorkingDirectory=$(pwd)
-# Type=forking
 
 # Shutdown container (if running) when unit is started
-ExecStartPre=$(which docker-compose) -H unix:$XDG_RUNTIME_DIR/podman/podman.sock -f docker-compose.yml down
+ExecStartPre=$(which podman-compose) down
 
 # Start container when unit is started
-ExecStart=$(which docker-compose) -H unix:$XDG_RUNTIME_DIR/podman/podman.sock -f docker-compose.yml up --remove-orphans
+ExecStart=$(which podman-compose) up --remove-orphans
 
 # Stop all services
-ExecStop=$(which docker-compose) -H unix:$XDG_RUNTIME_DIR/podman/podman.sock -f docker-compose.yml down
+ExecStop=$(which podman-compose) down
 
 [Install]
 WantedBy=default.target" > ${output_to}
 
-if [ "$DRY_RUN" != "1" ]; then
-  echo "done"
-fi
+# systemctl --user daemon-reload
+# systemctl --user start ${service_name}.service
+
+echo "done"
